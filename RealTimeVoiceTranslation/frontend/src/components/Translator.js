@@ -1,4 +1,7 @@
-import React from 'react';
+import React, { useEffect } from 'react';
+import io from 'socket.io-client';
+
+const socket = io('http://localhost:5000');
 
 const languages = [
   { code: 'en', name: 'English' },
@@ -15,6 +18,22 @@ const languages = [
 ];
 
 const Translator = () => {
+  useEffect(() => {
+    socket.on('connect', () => {
+      console.log('Connected to server');
+    });
+
+    socket.on('disconnect', () => {
+      console.log('Disconnected from server');
+    });
+
+    // Cleanup on unmount
+    return () => {
+      socket.off('connect');
+      socket.off('disconnect');
+    };
+  }, []);
+
   return (
     <main>
       <h2>Translate Your Voice in Real-Time</h2>
