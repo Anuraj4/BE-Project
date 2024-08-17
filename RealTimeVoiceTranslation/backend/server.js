@@ -1,32 +1,39 @@
 const express = require('express');
 const http = require('http');
 const socketIo = require('socket.io');
+const cors = require('cors');
 
 const app = express();
 const server = http.createServer(app);
 const io = socketIo(server, {
   cors: {
-    origin: 'http://localhost:3000',
+    origin: 'http://localhost:3000', // Make sure this matches your frontend URL
     methods: ['GET', 'POST']
   }
 });
 
-// Simple route to handle GET requests to the root URL
+app.use(cors());
+app.use(express.json());
+
+// Add a basic route to handle the root URL
 app.get('/', (req, res) => {
-  res.send('Backend server is running.');
+  res.send('Backend Server is Running');
 });
 
 io.on('connection', (socket) => {
-  console.log('A user connected');
+  console.log('a user connected');
 
-  socket.on('disconnect', () => {
-    console.log('A user disconnected');
+  socket.on('audioChunk', (chunk) => {
+    console.log('received audio chunk', chunk);
+    // Process the chunk here
   });
 
-  socket.on('error', (error) => {
-    console.error('Socket error:', error);
+  socket.on('disconnect', () => {
+    console.log('user disconnected');
   });
 });
 
 const PORT = process.env.PORT || 5000;
-server.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+server.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`);
+});

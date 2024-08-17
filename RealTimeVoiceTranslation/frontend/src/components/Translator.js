@@ -6,7 +6,7 @@ const socket = io('http://localhost:5000');
 const Translator = () => {
   const [isRecording, setIsRecording] = useState(false);
   const [transcription, setTranscription] = useState('');
-  const mediaRecorderRef = useRef(null);
+  const [interimTranscription, setInterimTranscription] = useState('');
   const speechRecognitionRef = useRef(null);
 
   const startRecording = () => {
@@ -23,14 +23,23 @@ const Translator = () => {
 
     recognition.onresult = (event) => {
       let interimTranscript = '';
+      let finalTranscript = '';
+
       for (let i = event.resultIndex; i < event.results.length; ++i) {
         if (event.results[i].isFinal) {
-          setTranscription((prev) => prev + event.results[i][0].transcript);
+          finalTranscript += event.results[i][0].transcript;
         } else {
           interimTranscript += event.results[i][0].transcript;
         }
       }
-      setTranscription((prev) => prev + interimTranscript);
+
+      setInterimTranscription(interimTranscript);
+      setTranscription((prev) => prev + finalTranscript);
+
+      // Emit the final transcript to the backend
+      if (finalTranscript) {
+        socket.emit('audioChunk', finalTranscript);
+      }
     };
 
     recognition.onerror = (event) => {
@@ -60,6 +69,7 @@ const Translator = () => {
         {isRecording ? 'Stop Recording' : 'Start Recording'}
       </button>
       <p>Transcription: {transcription}</p>
+      <p style={{ color: 'gray' }}>{interimTranscription}</p>
     </div>
   );
 };
