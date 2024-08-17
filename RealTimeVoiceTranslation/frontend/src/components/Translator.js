@@ -1,97 +1,66 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState, useRef } from 'react';
 import io from 'socket.io-client';
 
 const socket = io('http://localhost:5000');
 
-const languages = [
-  { code: 'en', name: 'English' },
-  { code: 'es', name: 'Spanish' },
-  { code: 'fr', name: 'French' },
-  { code: 'de', name: 'German' },
-  { code: 'zh', name: 'Chinese' },
-  { code: 'ja', name: 'Japanese' },
-  { code: 'ko', name: 'Korean' },
-  { code: 'ru', name: 'Russian' },
-  { code: 'ar', name: 'Arabic' },
-  { code: 'hi', name: 'Hindi' },
-  // Add more languages as needed
-];
-
 const Translator = () => {
   const [isRecording, setIsRecording] = useState(false);
-  const [mediaRecorder, setMediaRecorder] = useState(null);
+  const [transcription, setTranscription] = useState('');
+  const mediaRecorderRef = useRef(null);
+  const speechRecognitionRef = useRef(null);
 
-  useEffect(() => {
-    socket.on('connect', () => {
-      console.log('Connected to server');
-    });
-
-    socket.on('disconnect', () => {
-      console.log('Disconnected from server');
-    });
-
-    socket.on('connect_error', (error) => {
-      console.error('Connection error:', error);
-    });
-
-    // Cleanup on unmount
-    return () => {
-      socket.off('connect');
-      socket.off('disconnect');
-      socket.off('connect_error');
-    };
-  }, []);
-
-  const startRecording = async () => {
-    if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-      try {
-        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-        const recorder = new MediaRecorder(stream);
-
-        recorder.ondataavailable = (event) => {
-          if (event.data.size > 0) {
-            console.log('Sending audio chunk to server:', event.data);
-            socket.emit('audio', event.data);
-          }
-        };
-
-        recorder.start(100); // Record in 100ms chunks
-        setMediaRecorder(recorder);
-        setIsRecording(true);
-      } catch (error) {
-        console.error('Error accessing media devices.', error);
-      }
-    } else {
-      console.error('getUserMedia not supported on your browser!');
+  const startRecording = () => {
+    if (!('webkitSpeechRecognition' in window)) {
+      alert('Your browser does not support speech recognition. Please use Google Chrome.');
+      return;
     }
+
+    const SpeechRecognition = window.webkitSpeechRecognition;
+    const recognition = new SpeechRecognition();
+    recognition.lang = 'en-US';
+    recognition.continuous = true;
+    recognition.interimResults = true;
+
+    recognition.onresult = (event) => {
+      let interimTranscript = '';
+      for (let i = event.resultIndex; i < event.results.length; ++i) {
+        if (event.results[i].isFinal) {
+          setTranscription((prev) => prev + event.results[i][0].transcript);
+        } else {
+          interimTranscript += event.results[i][0].transcript;
+        }
+      }
+      setTranscription((prev) => prev + interimTranscript);
+    };
+
+    recognition.onerror = (event) => {
+      console.error('Speech recognition error', event.error);
+    };
+
+    recognition.onend = () => {
+      setIsRecording(false);
+    };
+
+    recognition.start();
+    speechRecognitionRef.current = recognition;
+    setIsRecording(true);
   };
 
   const stopRecording = () => {
-    if (mediaRecorder) {
-      mediaRecorder.stop();
-      setIsRecording(false);
+    if (speechRecognitionRef.current) {
+      speechRecognitionRef.current.stop();
     }
+    setIsRecording(false);
   };
 
   return (
-    <main>
-      <h2>Translate Your Voice in Real-Time</h2>
-      <div>
-        <label htmlFor="language">Choose Language:</label>
-        <select id="language">
-          {languages.map((language) => (
-            <option key={language.code} value={language.code}>
-              {language.name}
-            </option>
-          ))}
-        </select>
-      </div>
-      <div>
-        <button onClick={isRecording ? stopRecording : startRecording}>
-          {isRecording ? 'Stop Recording' : 'Start Recording'}
-        </button>
-      </div>
-    </main>
+    <div>
+      <h1>Real-Time Voice Translation</h1>
+      <button onClick={isRecording ? stopRecording : startRecording}>
+        {isRecording ? 'Stop Recording' : 'Start Recording'}
+      </button>
+      <p>Transcription: {transcription}</p>
+    </div>
   );
 };
 
