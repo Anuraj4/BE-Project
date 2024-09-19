@@ -3,7 +3,7 @@ import React from 'react';
 const Header = () => {
   return (
     <header>
-      <h1>Real-Time Voice Translation</h1>
+      <h1>Real-Time AI Voice Translation</h1>
     </header>
   );
 };
