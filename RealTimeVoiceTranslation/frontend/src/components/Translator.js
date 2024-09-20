@@ -1,12 +1,18 @@
 import React, { useState, useRef } from 'react';
 import io from 'socket.io-client';
+import 'cors'
 
-const socket = io('http://localhost:5000');
+
+
+const socket = io('http://localhost:5000', {
+  transports: ['websocket']
+});
 
 const Translator = () => {
   const [isRecording, setIsRecording] = useState(false);
   const [transcription, setTranscription] = useState('');
   const [interimTranscription, setInterimTranscription] = useState('');
+  const [translatedText, setTranslatedText] = useState(''); // State for translated text
   const speechRecognitionRef = useRef(null);
 
   const startRecording = () => {
@@ -17,7 +23,7 @@ const Translator = () => {
 
     const SpeechRecognition = window.webkitSpeechRecognition;
     const recognition = new SpeechRecognition();
-    recognition.lang = 'en-US';
+    recognition.lang = 'en-US';  // Recognize English speech
     recognition.continuous = true;
     recognition.interimResults = true;
 
@@ -36,18 +42,10 @@ const Translator = () => {
       setInterimTranscription(interimTranscript);
       setTranscription((prev) => prev + finalTranscript);
 
-      // Emit the final transcript to the backend
+      // Emit the final transcript to the backend for translation
       if (finalTranscript) {
         socket.emit('audioChunk', finalTranscript);
       }
-    };
-
-    recognition.onerror = (event) => {
-      console.error('Speech recognition error', event.error);
-    };
-
-    recognition.onend = () => {
-      setIsRecording(false);
     };
 
     recognition.start();
@@ -62,14 +60,20 @@ const Translator = () => {
     setIsRecording(false);
   };
 
+  // Listen for translated text from the backend
+  socket.on('translatedText', (translated) => {
+    setTranslatedText(translated);
+  });
+
   return (
     <div>
-      <h1>Real-Time Voice Translation</h1>
+      <h1>Real-Time Voice Translation (English to Marathi)</h1>
       <button onClick={isRecording ? stopRecording : startRecording}>
         {isRecording ? 'Stop Recording' : 'Start Recording'}
       </button>
-      <p>Transcription: {transcription}</p>
+      <p>Transcription (English): {transcription}</p>
       <p style={{ color: 'gray' }}>{interimTranscription}</p>
+      <p>Translated Text (Marathi): {translatedText}</p>
     </div>
   );
 };

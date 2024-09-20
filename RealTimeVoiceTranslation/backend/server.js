@@ -1,39 +1,40 @@
-const express = require('express');
-const http = require('http');
-const socketIo = require('socket.io');
-const cors = require('cors');
+import express from 'express';
+import { createServer } from 'http';
+import path from 'path';
+import fetch from 'node-fetch'; // Use import instead of require
+import { Server } from 'socket.io';
+import cors from 'cors';
 
 const app = express();
-const server = http.createServer(app);
-const io = socketIo(server, {
-  cors: {
-    origin: 'http://localhost:3000', // Make sure this matches your frontend URL
-    methods: ['GET', 'POST']
-  }
-});
+const server = createServer(app);
+const io = new Server(server);
 
-app.use(cors());
-app.use(express.json());
-
-// Add a basic route to handle the root URL
-app.get('/', (req, res) => {
-  res.send('Backend Server is Running');
-});
+app.use(cors({
+  origin: 'http://localhost:3000',
+  methods: ['GET', 'POST', 'PUT', 'DELETE'] // Allowed HTTP methods
+}));
+app.use(express.static(path.join(process.cwd(), 'public')));
 
 io.on('connection', (socket) => {
-  console.log('a user connected');
+  console.log('New client connected');
 
-  socket.on('audioChunk', (chunk) => {
-    console.log('received audio chunk', chunk);
-    // Process the chunk here
-  });
+  socket.on('audioChunk', async (text) => {
+    try {
+      const response = await fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=en|mr`);
+      const data = await response.json();
+      const translatedText = data.responseData.translatedText;
 
-  socket.on('disconnect', () => {
-    console.log('user disconnected');
+      console.log('Translated Text:', translatedText);
+
+      // Send the translated text back to the frontend for display
+      socket.emit('translatedText', translatedText);
+    } catch (error) {
+      console.error('Error during translation:', error);
+      socket.emit('translatedText', 'Error translating text');
+    }
   });
 });
 
-const PORT = process.env.PORT || 5000;
-server.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
+server.listen(5000, () => {
+  console.log('Server running on port 5000');
 });
