@@ -3,9 +3,9 @@
 }
 
 header {
-  background-color: #282c34;
+  background-color: #c5be70;
   padding: 20px;
-  color: white;
+  color: black;
 }
 
 main {
@@ -13,12 +13,13 @@ main {
 }
 
 footer {
-  background-color: #282c34;
+  background-color: #c5be70;
   padding: 10px;
-  color: white;
+  color: black;
   position: fixed;
   width: 100%;
   bottom: 0;
+  font-size: 20px;
 }
 
 select, button {
