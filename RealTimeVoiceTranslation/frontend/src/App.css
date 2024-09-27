@@ -3,7 +3,7 @@
 }
 
 header {
-  background-color: #c5be70;
+  background: linear-gradient(90deg, #f68e83 0%, #f7d283 100%);
   padding: 20px;
   color: black;
 }
@@ -13,7 +13,7 @@ main {
 }
 
 footer {
-  background-color: #c5be70;
+  background: linear-gradient(90deg, #f68e83 0%, #f7d283 100%);
   padding: 10px;
   color: black;
   position: fixed;

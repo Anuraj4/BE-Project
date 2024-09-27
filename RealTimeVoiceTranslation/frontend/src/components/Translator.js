@@ -1,6 +1,7 @@
 import React, { useState, useRef } from 'react';
 import io from 'socket.io-client';
 import 'cors'
+import '../App.css'
 
 
 
@@ -66,7 +67,7 @@ const Translator = () => {
   });
 
   return (
-    <div>
+    <div className='container'>
       <h1>Real-Time Voice Translation (English to Marathi)</h1>
       <button onClick={isRecording ? stopRecording : startRecording}>
         {isRecording ? 'Stop Recording' : 'Start Recording'}
