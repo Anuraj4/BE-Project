@@ -2,7 +2,7 @@ import React, { useState, useRef } from 'react';
 import io from 'socket.io-client';
 import 'cors'
 import '../App.css'
-
+import Button from 'react-bootstrap/Button';
 
 
 const socket = io('http://localhost:5000', {
@@ -67,14 +67,27 @@ const Translator = () => {
   });
 
   return (
-    <div className='container'>
-      <h1>Real-Time Voice Translation (English to Marathi)</h1>
-      <button onClick={isRecording ? stopRecording : startRecording}>
+    <div className='container text-center mt-5'>
+      <h1 className='custom-bold'>Real-Time Voice Translation</h1>
+      <p className='lead mb-4 text-secondary'>English to Marathi</p>
+      <Button
+        className='btn-lg mt-4'
+        variant={isRecording ? 'danger' : 'success'}
+        onClick={isRecording ? stopRecording : startRecording}
+      >
         {isRecording ? 'Stop Recording' : 'Start Recording'}
-      </button>
-      <p>Transcription (English): {transcription}</p>
-      <p style={{ color: 'gray' }}>{interimTranscription}</p>
-      <p>Translated Text (Marathi): {translatedText}</p>
+      </Button>
+
+      <div className='mt-4'>
+        <h5 className='text-muted'>Transcription (English):</h5>
+        <p className='transcription-text'>{transcription || 'No transcription yet...'}</p>
+        <p className='text-muted interim-text'>{interimTranscription}</p>
+      </div>
+
+      <div className='mt-4'>
+        <h5 className='text-muted'>Translated Text (Marathi):</h5>
+        <p className='translated-text'>{translatedText || 'No translation yet...'}</p>
+      </div>
     </div>
   );
 };
