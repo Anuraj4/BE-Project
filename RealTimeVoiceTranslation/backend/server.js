@@ -3,7 +3,6 @@ import { createServer } from 'http';
 import path from 'path';
 import fetch from 'node-fetch'; // Optional if Node version < 18
 import { Server } from 'socket.io';
-import cors from 'cors';
 
 const app = express();
 const server = createServer(app);
