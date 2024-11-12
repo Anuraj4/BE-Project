@@ -1,7 +1,6 @@
 .App {
   text-align: center;
 }
-
 header {
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
@@ -33,13 +32,12 @@ main {
 footer {
   background: linear-gradient(45deg, #88e5fe, #e6e8ea); /* Blue gradient */
   box-shadow: 0 -4px 8px rgba(0, 0, 0, 0.3); /* Adjusted for shadow on the upper side */
-  padding: 10px;
   color: black;
   position: fixed;
   width: 100%;
   bottom: 0;
-  font-size: 20px;
-  padding-top: 25px;
+  font-size: 15px;
+  padding-top: 10px;
 }
 
 select,

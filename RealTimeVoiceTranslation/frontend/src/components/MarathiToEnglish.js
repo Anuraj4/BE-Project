@@ -1,15 +1,14 @@
 import React, { useState, useRef } from 'react';
 import io from 'socket.io-client';
-import 'cors'
-import '../App.css'
+import 'cors';
+import '../App.css';
 import Button from 'react-bootstrap/Button';
-
 
 const socket = io('http://localhost:5000', {
   transports: ['websocket']
 });
 
-const Translator = () => {
+const MarathiToEnglish = () => {
   const [isRecording, setIsRecording] = useState(false);
   const [transcription, setTranscription] = useState('');
   const [interimTranscription, setInterimTranscription] = useState('');
@@ -24,7 +23,7 @@ const Translator = () => {
 
     const SpeechRecognition = window.webkitSpeechRecognition;
     const recognition = new SpeechRecognition();
-    recognition.lang = 'en-US';  // Recognize English speech
+    recognition.lang = 'mr-IN';  // Recognize Marathi speech
     recognition.continuous = true;
     recognition.interimResults = true;
 
@@ -43,9 +42,9 @@ const Translator = () => {
       setInterimTranscription(interimTranscript);
       setTranscription((prev) => prev + finalTranscript);
 
-      // Emit the final transcript to the backend for translation
+      // Emit the final transcript (in Marathi) to the backend for translation to English
       if (finalTranscript) {
-        socket.emit('audioChunk', finalTranscript);
+        socket.emit('audioChunk', finalTranscript);  // Send Marathi text for translation
       }
     };
 
@@ -61,7 +60,7 @@ const Translator = () => {
     setIsRecording(false);
   };
 
-  // Listen for translated text from the backend
+  // Listen for translated text (English) from the backend
   socket.on('translatedText', (translated) => {
     setTranslatedText(translated);
   });
@@ -69,9 +68,9 @@ const Translator = () => {
   return (
     <div className='container text-center mt-4'>
       <h1 className='custom-bold'>Real-Time Voice Translation</h1>
-      <p className='lead mb-4 text-secondary'>English to Marathi</p>
+      <p className='lead mb-4 text-secondary'>Marathi to English</p>
       <Button
-        className='btn-lg mt-1'
+        className='btn-lg mt-4'
         variant={isRecording ? 'danger' : 'success'}
         onClick={isRecording ? stopRecording : startRecording}
       >
@@ -79,17 +78,17 @@ const Translator = () => {
       </Button>
 
       <div className='mt-4'>
-        <h5 className='text-muted'>Transcription (English):</h5>
+        <h5 className='text-muted'>Transcription (Marathi):</h5>
         <p className='transcription-text'>{transcription || 'No transcription yet...'}</p>
         <p className='text-muted interim-text'>{interimTranscription}</p>
       </div>
 
       <div className='mt-4'>
-        <h5 className='text-muted'>Translated Text (Marathi):</h5>
+        <h5 className='text-muted'>Translated Text (English):</h5>
         <p className='translated-text'>{translatedText || 'No translation yet...'}</p>
       </div>
     </div>
   );
 };
 
-export default Translator;
+export default MarathiToEnglish;

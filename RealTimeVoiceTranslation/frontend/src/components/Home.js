@@ -1,31 +1,55 @@
 import React, { useState } from 'react';
 import Translator from './Translator';
 import Button from 'react-bootstrap/Button';
+import MarathiToEnglish from './MarathiToEnglish';
+import '../App.css';
 
 const Home = () => {
     const [showTranslator, setShowTranslator] = useState(false);
+    const [showMarathiToEnglish, setShowMarathiToEnglish] = useState(false);
 
-    const handleButtonClick = () => {
-        setShowTranslator((prevState) => !prevState); // Toggle the component visibility
+    // Toggle visibility of Translator component
+    const handleTranslatorButtonClick = () => {
+        setShowTranslator((prevState) => !prevState);
+    };
+
+    // Toggle visibility of MarathiToEnglish component
+    const handleMarathiToEnglishButtonClick = () => {
+        setShowMarathiToEnglish((prevState) => !prevState);
     };
 
     return (
         <>
-            {/* Styling for 'Select The Language' using Bootstrap */}
-            <div className="text-center mt-5">
+            <div className="text-center mt-4">
                 <h3>Select The Language</h3>
             </div>
+            {/* Select The Language section */}
+            <div className="home-container">
+                {/* English to Marathi Translator button */}
+                <div className="text-center mt-4">
+                    <Button
+                        className="btn-lg mt-1"
+                        variant="primary" // Change variant as needed
+                        onClick={handleTranslatorButtonClick}
+                    >
+                        {showTranslator ? 'Close Translator' : 'English To Marathi'}
+                    </Button>
+                    {showTranslator && <Translator />} {/* Conditionally render Translator */}
+                </div>
+            </div>
 
-            {/* Main content */}
-            <div className="text-center mt-4">
-                <Button
-                    className="btn-lg mt-2"
-                    variant="primary" // You can change this to any color variant like "success", "danger", etc.
-                    onClick={handleButtonClick}
-                >
-                    {showTranslator ? 'Close Translator' : 'English To Marathi'}
-                </Button>
-                {showTranslator && <Translator />} {/* Conditionally render the Translator component */}
+            {/* Marathi to English Translator section */}
+            <div className="home-container">
+                <div className="text-center mt-4">
+                    <Button
+                        className="btn-lg mt-2"
+                        variant="primary" // Change variant as needed
+                        onClick={handleMarathiToEnglishButtonClick}
+                    >
+                        {showMarathiToEnglish ? 'Close Translator' : 'Marathi To English'}
+                    </Button>
+                    {showMarathiToEnglish && <MarathiToEnglish />} {/* Conditionally render MarathiToEnglish */}
+                </div>
             </div>
         </>
     );
