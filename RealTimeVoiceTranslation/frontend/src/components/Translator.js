@@ -67,7 +67,7 @@ const Translator = () => {
   });
 
   return (
-    <div className='container text-center mt-5'>
+    <div className='container text-center mt-4'>
       <h1 className='custom-bold'>Real-Time Voice Translation</h1>
       <p className='lead mb-4 text-secondary'>English to Marathi</p>
       <Button
