@@ -23,6 +23,7 @@ jspm_packages/
 
 # dotenv environment variables file
 .env
+package-lock.json
 
 # Next.js build output
 .next
