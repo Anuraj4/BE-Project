@@ -1,7 +1,7 @@
 import React, { useState, useRef } from 'react';
 import io from 'socket.io-client';
 import 'cors'
-import '../App.css'
+import './Translator.css';
 import Button from 'react-bootstrap/Button';
 
 
@@ -67,7 +67,7 @@ const Translator = () => {
   });
 
   return (
-    <div className='container text-center mt-4'>
+    <div className='container text-center'>
       <h1 className='custom-bold'>Real-Time Voice Translation</h1>
       <p className='lead mb-4 text-secondary'>English to Marathi</p>
       <Button

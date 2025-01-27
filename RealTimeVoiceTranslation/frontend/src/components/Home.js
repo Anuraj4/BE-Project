@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import Translator from './Translator';
 import Button from 'react-bootstrap/Button';
 import MarathiToEnglish from './MarathiToEnglish';
-import '../App.css';
+import './Home.css';
 
 const Home = () => {
     const [showTranslator, setShowTranslator] = useState(false);
