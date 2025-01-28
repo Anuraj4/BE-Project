@@ -7,6 +7,9 @@
     margin: 30px auto;
     text-align: left;
 }
+body{
+    background-color: white;
+}
 
 .instructions-heading {
     font-size: 2rem;

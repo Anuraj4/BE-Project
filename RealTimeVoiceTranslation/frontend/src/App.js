@@ -6,6 +6,7 @@ import FrontPage from './components/FrontPage'; // Import FrontPage component
 import Instructions from './components/Instructions'; // Import FrontPage component
 import './App.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import Playback from './components/Playback';
 
 function App() {
   return (
@@ -18,6 +19,7 @@ function App() {
           <Route path="/home" element={<Home />} /> {/* Home component when at /home */}
           <Route path="/frontpage" element={<FrontPage />} /> {/* Another route for FrontPage */}
           <Route path="/instructions" element={<Instructions />} /> {/* Another route for FrontPage */}
+          <Route path="/playback" element={<Playback />} /> {/* Another route for FrontPage */}
           {/* Add any additional routes here */}
         </Routes>
       </div>
