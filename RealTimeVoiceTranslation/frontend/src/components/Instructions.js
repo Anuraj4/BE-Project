@@ -10,7 +10,7 @@ const Instructions = () => {
           <span className="instruction-step">Step 1:</span> Select the language you want to translate from the options available.
         </li>
         <li>
-          <span className="instruction-step">Step 2:</span> Speak or type your message in the selected language.
+          <span className="instruction-step">Step 2:</span> Speak your message in the selected language.
         </li>
         <li>
           <span className="instruction-step">Step 3:</span> Our model will instantly translate your message to the target language in real-time.

@@ -3,6 +3,7 @@ import io from 'socket.io-client';
 import Sentiment from 'sentiment'; // Sentiment analysis
 import './Translator.css';
 import Button from 'react-bootstrap/Button';
+import Playback from './Playback'; // Import Playback component
 
 const socket = io('http://localhost:5000', {
   transports: ['websocket']
@@ -195,6 +196,9 @@ const Translator = () => {
         <h5 className="text-muted">Translated Text (Marathi):</h5>
         <p className="translated-text">{translatedText || 'No translation yet...'}</p>
       </div>
+
+      {/* Add Playback component and pass translatedText as prop */}
+      <Playback translatedText={translatedText} />
     </div>
   );
 };

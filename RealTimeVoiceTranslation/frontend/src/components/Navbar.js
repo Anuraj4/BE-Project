@@ -27,8 +27,8 @@ const NavigationBar = () => {
                 {/* <li><Link to="/home">Get Started</Link></li> Link to Home */}
                 <li><a href="/instructions">Instructions</a></li>
                 <li><a href="/playback">Playback</a></li>
-                <li><a href="#feedback">Feedback</a></li>
-                <li><a href="#contact">Contact</a></li>
+                <li><a href="/feedback">Feedback</a></li>
+                {/* <li><a href="#contact">Contact</a></li> */}
             </ul>
         </nav>
     );
