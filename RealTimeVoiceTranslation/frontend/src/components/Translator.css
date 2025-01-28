@@ -3,10 +3,8 @@ body {
     margin: 0;
     padding: 0;
     font-family: 'Roboto', sans-serif;
-    background: linear-gradient(135deg, #6b8eba, #85addf, #ada9d2);
     min-height: 100vh;
     color: #fff;
-    display: flex;
     justify-content: center;
     align-items: center;
     text-align: center;
@@ -17,7 +15,7 @@ body {
     background: rgba(255, 255, 255, 0.2);
     backdrop-filter: blur(10px);
     border-radius: 20px;
-    padding: 30px 40px;
+    padding: 10px 40px;
     box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
     max-width: 700px;
     width: 90%;

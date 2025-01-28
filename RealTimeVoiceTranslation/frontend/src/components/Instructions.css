@@ -1,0 +1,123 @@
+.instructions-container {
+    background-color: #f4f8fb;
+    padding: 40px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    max-width: 800px;
+    margin: 30px auto;
+    text-align: left;
+}
+
+.instructions-heading {
+    font-size: 2rem;
+    color: #333;
+    margin-bottom: 30px;
+    text-align: center;
+    font-family: 'Arial', sans-serif;
+    font-weight: bold;
+}
+
+.instructions-list {
+    list-style-type: none;
+    padding: 0;
+}
+
+.instructions-list li {
+    background-color: #fff;
+    padding: 15px;
+    margin: 10px 0;
+    border-radius: 6px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    transition: background-color 0.3s ease;
+}
+
+.instructions-list li:hover {
+    background-color: #eef2f5;
+}
+
+.instruction-step {
+    font-weight: bold;
+    color: #007bff;
+    margin-right: 10px;
+}
+
+.instructions-list li::before {
+    content: "✓";
+    color: #007bff;
+    font-size: 20px;
+    margin-right: 15px;
+    font-weight: bold;
+}
+
+.instructions-list li span {
+    color: #333;
+    font-size: 1.1rem;
+}
+
+/* Responsive Styles */
+@media (max-width: 1200px) {
+    .instructions-container {
+        padding: 30px;
+    }
+
+    .instructions-heading {
+        font-size: 1.8rem;
+    }
+
+    .instructions-list li {
+        font-size: 1.05rem;
+    }
+}
+
+@media (max-width: 992px) {
+    .instructions-container {
+        padding: 20px;
+    }
+
+    .instructions-heading {
+        font-size: 1.7rem;
+    }
+
+    .instructions-list li {
+        font-size: 1rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .instructions-container {
+        padding: 15px;
+    }
+
+    .instructions-heading {
+        font-size: 1.6rem;
+    }
+
+    .instructions-list li {
+        font-size: 0.95rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .instructions-container {
+        padding: 12px;
+    }
+
+    .instructions-heading {
+        font-size: 1.4rem;
+    }
+
+    .instructions-list li {
+        font-size: 0.9rem;
+    }
+
+    .instructions-list li::before {
+        font-size: 18px;
+        /* Smaller checkmark */
+        margin-right: 10px;
+    }
+
+    .instruction-step {
+        font-size: 1rem;
+        /* Smaller step text for mobile */
+    }
+}

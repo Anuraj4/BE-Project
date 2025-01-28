@@ -20,15 +20,25 @@ const Home = () => {
 
     return (
         <>
-            <div className="text-center mt-4">
-                <h3>Select The Language</h3>
+            <div className="hero-section text-center">
+                <h1 className="main-heading">Real-Time Language Translation Using AI and Emotion Detection</h1>
+                <p className="description">
+                    Our AI-powered system provides seamless language translation with real-time accuracy and emotion detection.
+                    Break down barriers and communicate effortlessly across different languages, ensuring your message is conveyed
+                    clearly and empathetically.
+                </p>
+                <img src="path_to_your_image.jpg" alt="Language Translation" className="hero-image" />
+            </div>
+
+            <div className="text-center mt-24">
+                <h3 style={{marginTop:'25px'}}>Select The Language</h3>
             </div>
             {/* Select The Language section */}
             <div className="home-container">
                 {/* English to Marathi Translator button */}
                 <div className="text-center mt-4">
                     <Button
-                        className="btn-lg mt-1"
+                        className="btn-lg mt-1 custom-btn"
                         variant="primary" // Change variant as needed
                         onClick={handleTranslatorButtonClick}
                     >
@@ -42,7 +52,7 @@ const Home = () => {
             <div className="home-container">
                 <div className="text-center mt-4">
                     <Button
-                        className="btn-lg mt-2"
+                        className="btn-lg mt-2 custom-btn"
                         variant="primary" // Change variant as needed
                         onClick={handleMarathiToEnglishButtonClick}
                     >
@@ -50,6 +60,19 @@ const Home = () => {
                     </Button>
                     {showMarathiToEnglish && <MarathiToEnglish />} {/* Conditionally render MarathiToEnglish */}
                 </div>
+            </div>
+
+            {/* Additional Information Section */}
+            <div className="info-section mt-5">
+                <h4>Why Choose Our Translation System?</h4>
+                <p style={{marginBottom:'50px'}}>
+                    Our system is not just about translating words but understanding emotions behind every sentence.
+                </p>
+
+                <h4>How Does Emotion Detection Enhance Communication?</h4>
+                <p>
+                    It understands whether the speaker is happy, sad, frustrated, or excited and translates the message accordingly.
+                </p>
             </div>
         </>
     );

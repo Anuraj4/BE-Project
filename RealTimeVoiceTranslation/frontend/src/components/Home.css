@@ -1,109 +1,221 @@
-/* General Styles */
-body {
-    margin: 0;
-    padding: 0;
-    font-family: 'Arial', sans-serif;
-    min-height: 100vh;
-    color: #fff;
-    overflow-x: hidden;
-}
-
-/* Center alignment for all main content */
-.home-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    flex-direction: column;
-    margin-top: 20px;
-    padding: 20px;
-}
-
-/* Stylish Header */
-h3 {
-    font-size: 2rem;
-    font-weight: bold;
-    color: #fff;
-    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
-    animation: fadeInDown 1s ease-in-out;
-}
-
-/* Button Styles */
-button.btn-lg {
-    padding: 10px 20px;
-    font-size: 1.2rem;
-    font-weight: bold;
-    border: none;
-    border-radius: 10px;
-    cursor: pointer;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
-    transition: all 0.3s ease;
-    backdrop-filter: blur(5px);
-    color: #fff;
-    text-transform: uppercase;
-}
-
-button.btn-lg:hover {
-    transform: scale(1.05);
-    box-shadow: 0 6px 10px rgba(0, 0, 0, 0.3);
-}
-
-button.btn-lg:active {
-    background: rgba(255, 255, 255, 0.5);
-    transform: scale(0.95);
-}
-
-/* Translator and MarathiToEnglish Animations */
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(10px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-@keyframes fadeOut {
-    from {
-        opacity: 1;
-        transform: translateY(0);
-    }
-    to {
-        opacity: 0;
-        transform: translateY(10px);
-    }
-}
-
-.home-container .translator, 
-.home-container .marathi-to-english {
-    animation: fadeIn 0.5s ease-in-out;
-    padding: 20px;
-    margin: 10px 0;
-    border-radius: 15px;
-    backdrop-filter: blur(15px);
-    background: rgba(0, 0, 0, 0.4);
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+/* Base Styles */
+.hero-section {
+    background-color: #f5f5f5;
+    padding: 40px 0;
+    border-radius: 8px;
     text-align: center;
-    color: #fff;
 }
 
-/* Smooth transition for the toggle effects */
-.home-container .translator.hidden,
-.home-container .marathi-to-english.hidden {
-    animation: fadeOut 0.5s ease-in-out;
-    opacity: 0;
-    display: none;
+.main-heading {
+    font-size: 2.5rem;
+    color: white;
+    margin-bottom: 20px;
 }
 
-/* Responsive Design */
-@media (max-width: 768px) {
-    h3 {
+.description {
+    font-size: 1.1rem;
+    color: #555;
+    margin-bottom: 30px;
+}
+
+.hero-image {
+    max-width: 100%;
+    height: auto;
+    margin-top: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.custom-btn {
+    padding: 12px 30px;
+    font-size: 1rem;
+    background-color: #007bff;
+    border-radius: 8px;
+    transition: background-color 0.3s ease;
+}
+
+.custom-btn:hover {
+    background-color: #0056b3;
+    color: white;
+}
+
+.info-section {
+    background-color: #f9f9f9;
+    padding: 40px;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    margin-top: 40px;
+    text-align: center;
+}
+
+.info-section h4 {
+    font-size: 1.75rem;
+    color: #333;
+    margin-bottom: 20px;
+}
+
+.info-section p {
+    font-size: 1.1rem;
+    color: #555;
+    line-height: 1.6;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.home-container {
+    margin-bottom: 40px;
+}
+
+.hero-section {
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: center;
+    position: relative;
+}
+
+.hero-section::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    /* Dark overlay with 80% opacity */
+    z-index: 1;
+}
+
+.hero-section .content {
+    position: relative;
+    z-index: 2;
+    /* Ensures the content is above the overlay */
+    color: white;
+    /* Text color to stand out on dark background */
+    padding: 20px;
+}
+
+/* Media Queries */
+
+/* For small devices (max-width: 767px) */
+@media (max-width: 767px) {
+    .hero-section {
+        padding: 30px 15px;
+    }
+
+    .main-heading {
+        font-size: 1.75rem;
+        /* Smaller font size on mobile */
+    }
+
+    .description {
+        font-size: 1rem;
+        /* Adjusting text size for mobile */
+        margin-bottom: 20px;
+    }
+
+    .hero-image {
+        width: 100%;
+        height: auto;
+    }
+
+    .info-section {
+        padding: 30px;
+        margin-top: 30px;
+    }
+
+    .info-section h4 {
         font-size: 1.5rem;
     }
 
-    button.btn-lg {
+    .info-section p {
         font-size: 1rem;
-        padding: 8px 16px;
+    }
+
+    .custom-btn {
+        width: 100%;
+        font-size: 1rem;
+        padding: 10px 20px;
+    }
+}
+
+/* For medium devices (768px to 1024px) */
+@media (min-width: 768px) and (max-width: 1024px) {
+    .hero-section {
+        padding: 40px 20px;
+    }
+
+    .main-heading {
+        font-size: 2rem;
+        /* Slightly smaller font size for tablets */
+    }
+
+    .description {
+        font-size: 1.1rem;
+        margin-bottom: 25px;
+    }
+
+    .hero-image {
+        width: 80%;
+        margin-top: 20px;
+        border-radius: 10px;
+    }
+
+    .info-section {
+        padding: 35px;
+        margin-top: 35px;
+    }
+
+    .info-section h4 {
+        font-size: 1.6rem;
+    }
+
+    .info-section p {
+        font-size: 1.05rem;
+    }
+
+    .custom-btn {
+        width: 80%;
+        font-size: 1rem;
+        padding: 12px 25px;
+    }
+}
+
+/* For large devices (1025px and above) */
+@media (min-width: 1025px) {
+    .hero-section {
+        padding: 50px 40px;
+    }
+
+    .main-heading {
+        font-size: 2.5rem;
+    }
+
+    .description {
+        font-size: 1.1rem;
+    }
+
+    .hero-image {
+        max-width: 100%;
+        height: auto;
+        margin-top: 20px;
+        border-radius: 10px;
+    }
+
+    .info-section {
+        padding: 40px;
+        margin-top: 40px;
+    }
+
+    .info-section h4 {
+        font-size: 1.75rem;
+    }
+
+    .info-section p {
+        font-size: 1.1rem;
+    }
+
+    .custom-btn {
+        padding: 12px 30px;
+        font-size: 1rem;
     }
 }
