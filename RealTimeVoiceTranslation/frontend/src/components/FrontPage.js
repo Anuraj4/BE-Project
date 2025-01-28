@@ -13,7 +13,7 @@ const FrontPage = () => {
     return (
         <div className="front-page-container">
             <div className="text-section">
-                <h1 className="main-heading">Real-Time Language Translation Using AI and Emotion Detection</h1>
+                <h1 className="main-heading" style={{fontWeight:'bold'}}>Real-Time Language Translation Using AI and Emotion Detection</h1>
                 <p className="description">
                     Experience seamless, instant language translation powered by AI. Our system offers real-time translation, enabling smooth communication across different languages.
                     With the added capability of emotion detection, it understands and interprets the emotional tone behind the conversation, ensuring that your message is conveyed accurately and empathetically.

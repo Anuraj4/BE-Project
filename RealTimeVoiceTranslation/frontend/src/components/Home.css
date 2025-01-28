@@ -54,7 +54,6 @@ body {
     align-items: center;
     justify-content: center;
     margin: 0 auto;
-    min-height: calc(80vh - 200px);
     /* Adjust height considering the hero section */
     padding: 20px;
     /* Optional for better visibility */
@@ -128,6 +127,9 @@ body {
     100% {
         opacity: 1;
     }
+}
+.select-button{
+    text-align: center;
 }
 
 .fade-in {

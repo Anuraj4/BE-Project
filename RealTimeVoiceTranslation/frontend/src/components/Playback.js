@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import './Playback.css';
+import { FaTrash } from 'react-icons/fa'; // Import delete icon
 
 const Playback = ({ translatedText }) => {
     const [translations, setTranslations] = useState([]);
@@ -27,12 +28,25 @@ const Playback = ({ translatedText }) => {
         }
     }, [translatedText]);
 
+    // Delete a translation
+    const handleDelete = (index) => {
+        const updatedTranslations = translations.filter((_, i) => i !== index);
+        setTranslations(updatedTranslations);
+        sessionStorage.setItem('translations', JSON.stringify(updatedTranslations));
+    };
+
     return (
         <div className="playback-container">
             <h5 className="text-muted">Playback History (Latest 10):</h5>
-            <ul>
+            <ul className="translated-list">
                 {translations.map((text, index) => (
-                    <li key={index}>{text}</li>
+                    <li key={index} className="translated-item">
+                        <span className="item-number">{index + 1}.</span>
+                        <span className="item-text">{text}</span>
+                        <button className="delete-button" onClick={() => handleDelete(index)}>
+                            <FaTrash />
+                        </button>
+                    </li>
                 ))}
             </ul>
         </div>
