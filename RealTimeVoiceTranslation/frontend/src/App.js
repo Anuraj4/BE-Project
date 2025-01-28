@@ -8,6 +8,7 @@ import './App.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import Playback from './components/Playback';
 import Feedback from './components/Feedback';
+import Footer from './components/Footer';
 
 function App() {
   return (
