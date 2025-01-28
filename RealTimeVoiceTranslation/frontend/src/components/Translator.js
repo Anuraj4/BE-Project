@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import io from 'socket.io-client';
+import Sentiment from 'sentiment'; // Sentiment analysis
 import './Translator.css';
 import Button from 'react-bootstrap/Button';
 
@@ -14,15 +15,61 @@ const Translator = () => {
   const [translatedText, setTranslatedText] = useState('');
   const speechRecognitionRef = useRef(null);
 
-  // Reference flags for managing recognition and synthesis states
   const isSpeakingRef = useRef(false);
   const isRecognitionActiveRef = useRef(false);
 
-  // Function to speak text using SpeechSynthesis API
+  // Advanced Sentiment Analysis Function
+  const analyzeSentiment = (text) => {
+    const sentimentAnalyzer = new Sentiment();
+    const result = sentimentAnalyzer.analyze(text);
+    return result.score;
+  };
+
+  // Emotional Tone Function based on Sentiment Score
+  const determineTone = (sentimentScore, sentence) => {
+    const exclamationMark = sentence.includes('!');
+    const questionMark = sentence.includes('?');
+    const emotionalKeywords = ['angry', 'happy', 'excited', 'sad', 'frustrated'];
+
+    let pitch = 1.0;
+    let rate = 1.0;
+    let volume = 1.0;
+    let emphasis = 1.0;
+
+    if (emotionalKeywords.some(keyword => sentence.toLowerCase().includes(keyword))) {
+      // Emotionally charged sentence
+      if (sentence.toLowerCase().includes('angry')) {
+        pitch = 0.5; rate = 0.8; volume = 1.2;
+      } else if (sentence.toLowerCase().includes('happy')) {
+        pitch = 2.0; rate = 1.4; volume = 1.1;
+      } else if (sentence.toLowerCase().includes('excited')) {
+        pitch = 2.5; rate = 1.6; volume = 1.3;
+      } else if (sentence.toLowerCase().includes('sad')) {
+        pitch = 0.6; rate = 0.9; volume = 0.8;
+      } else if (sentence.toLowerCase().includes('frustrated')) {
+        pitch = 0.7; rate = 0.8; volume = 1.0;
+      }
+    } else {
+      // Neutral sentiment-based tone
+      if (sentimentScore >= 7) {
+        pitch = 2.2; rate = 1.5; volume = 1.2; emphasis = exclamationMark ? 1.4 : 1.0;
+      } else if (sentimentScore >= 3) {
+        pitch = 1.8; rate = 1.3; volume = 1.1; emphasis = exclamationMark ? 1.2 : 1.0;
+      } else if (sentimentScore >= 0) {
+        pitch = 1.2; rate = 1.1; volume = 1.0; emphasis = exclamationMark ? 1.1 : 1.0;
+      } else if (sentimentScore <= -7) {
+        pitch = 0.6; rate = 0.8; volume = 0.7; emphasis = questionMark ? 1.2 : 1.0;
+      } else if (sentimentScore <= -3) {
+        pitch = 0.8; rate = 0.9; volume = 0.8; emphasis = questionMark ? 1.1 : 1.0;
+      }
+    }
+
+    return { pitch, rate, volume, emphasis };
+  };
+
   const speakTranslatedText = (text) => {
     if (!text) return;
 
-    // Stop recognition while speaking
     if (speechRecognitionRef.current && isRecognitionActiveRef.current) {
       speechRecognitionRef.current.stop();
       isRecognitionActiveRef.current = false;
@@ -30,10 +77,17 @@ const Translator = () => {
 
     isSpeakingRef.current = true;
 
-    const utterance = new SpeechSynthesisUtterance(text);
-    utterance.lang = 'mr-IN'; // Set the language for Marathi
+    const sentimentScore = analyzeSentiment(text);
+    const tone = determineTone(sentimentScore, text);
 
-    // Resume recognition after speaking is done
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.lang = 'mr-IN'; // Set language to Marathi
+    utterance.pitch = tone.pitch;
+    utterance.rate = tone.rate;
+    utterance.volume = tone.volume;
+    utterance.pitch *= tone.emphasis;
+    utterance.rate *= tone.emphasis;
+
     utterance.onend = () => {
       isSpeakingRef.current = false;
       if (isRecording && !isRecognitionActiveRef.current) {
@@ -53,7 +107,7 @@ const Translator = () => {
 
     const SpeechRecognition = window.webkitSpeechRecognition;
     const recognition = new SpeechRecognition();
-    recognition.lang = 'en-US'; // Recognize English speech
+    recognition.lang = 'en-US';
     recognition.continuous = true;
     recognition.interimResults = true;
 
@@ -63,8 +117,6 @@ const Translator = () => {
 
     recognition.onend = () => {
       isRecognitionActiveRef.current = false;
-
-      // Automatically restart recognition if still recording and not speaking
       if (isRecording && !isSpeakingRef.current) {
         recognition.start();
         isRecognitionActiveRef.current = true;
@@ -72,7 +124,7 @@ const Translator = () => {
     };
 
     recognition.onresult = (event) => {
-      if (isSpeakingRef.current) return; // Skip processing input during speech synthesis
+      if (isSpeakingRef.current) return;
 
       let interimTranscript = '';
       let finalTranscript = '';
@@ -88,7 +140,6 @@ const Translator = () => {
       setInterimTranscription(interimTranscript);
       setTranscription((prev) => prev + finalTranscript);
 
-      // Emit the final transcript to the backend for translation
       if (finalTranscript) {
         socket.emit('audioChunk', finalTranscript);
       }
@@ -106,21 +157,18 @@ const Translator = () => {
     }
     setIsRecording(false);
 
-    // Cancel ongoing speech synthesis
     window.speechSynthesis.cancel();
   };
 
   useEffect(() => {
-    // Listen for translated text from the backend
     socket.on('translatedText', (translated) => {
       setTranslatedText(translated);
       if (isRecording) {
-        speakTranslatedText(translated); // Speak the translated text only if recording is active
+        speakTranslatedText(translated); // Speak if recording is active
       }
     });
 
     return () => {
-      // Clean up the socket event listener when the component unmounts
       socket.off('translatedText');
     };
   }, [isRecording]);
