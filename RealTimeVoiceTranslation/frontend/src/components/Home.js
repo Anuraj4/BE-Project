@@ -30,41 +30,43 @@ const Home = () => {
                     </p>
                 </div>
             </div>
-            <div className="select-button">
-                <h3>Select the language</h3>
-            </div>
-            <div className="home-container">
-                {/* English to Marathi Translator */}
-                <div className="button-container">
-                    <Button
-                        className={`btn-lg custom-btn ${showTranslator ? "active-btn" : ""
-                            }`}
-                        onClick={handleTranslatorButtonClick}
-                    >
-                        {showTranslator ? "Close Translator" : "English To Marathi"}
-                    </Button>
-                    <div
-                        className={`translator-container ${showTranslator ? "fade-in" : "fade-out"
-                            }`}
-                    >
-                        {showTranslator && <Translator />}
-                    </div>
+            <div className="tsBody">
+                <div className="select-button">
+                    <h3>Select the language</h3>
                 </div>
+                <div className="home-container">
+                    {/* English to Marathi Translator */}
+                    <div className="button-container">
+                        <Button
+                            className={`btn-lg custom-btn ${showTranslator ? "active-btn" : ""
+                                }`}
+                            onClick={handleTranslatorButtonClick}
+                        >
+                            {showTranslator ? "Close Translator" : "English To Marathi"}
+                        </Button>
+                        <div
+                            className={`translator-container ${showTranslator ? "fade-in" : "fade-out"
+                                }`}
+                        >
+                            {showTranslator && <Translator />}
+                        </div>
+                    </div>
 
-                {/* Marathi to English Translator */}
-                <div className="button-container">
-                    <Button
-                        className={`btn-lg custom-btn ${showMarathiToEnglish ? "active-btn" : ""
-                            }`}
-                        onClick={handleMarathiToEnglishButtonClick}
-                    >
-                        {showMarathiToEnglish ? "Close Translator" : "Marathi To English"}
-                    </Button>
-                    <div
-                        className={`translator-container ${showMarathiToEnglish ? "fade-in" : "fade-out"
-                            }`}
-                    >
-                        {showMarathiToEnglish && <MarathiToEnglish />}
+                    {/* Marathi to English Translator */}
+                    <div className="button-container">
+                        <Button
+                            className={`btn-lg custom-btn ${showMarathiToEnglish ? "active-btn" : ""
+                                }`}
+                            onClick={handleMarathiToEnglishButtonClick}
+                        >
+                            {showMarathiToEnglish ? "Close Translator" : "Marathi To English"}
+                        </Button>
+                        <div
+                            className={`translator-container ${showMarathiToEnglish ? "fade-in" : "fade-out"
+                                }`}
+                        >
+                            {showMarathiToEnglish && <MarathiToEnglish />}
+                        </div>
                     </div>
                 </div>
             </div>

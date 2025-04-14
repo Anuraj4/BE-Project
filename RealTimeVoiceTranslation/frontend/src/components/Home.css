@@ -14,7 +14,6 @@ body {
     text-align: center;
     padding: 50px 20px;
     border-radius: 8px;
-    margin-bottom: 40px;
     position: relative;
     overflow: hidden;
 }
@@ -47,7 +46,9 @@ body {
     margin-bottom: 20px;
     color: white;
 }
-
+.tsBody{
+    background-color: #fd6344;
+}
 .home-container {
     display: flex;
     flex-direction: column;
@@ -94,6 +95,9 @@ body {
 .translator-container {
     margin-top: 20px;
     animation: fade-in 0.5s ease;
+}
+.select-button{
+    padding-top: 20px;
 }
 
 /* Animations */
