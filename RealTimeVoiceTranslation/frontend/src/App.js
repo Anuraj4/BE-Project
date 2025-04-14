@@ -9,6 +9,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import Playback from './components/Playback';
 import Feedback from './components/Feedback';
 import Footer from './components/Footer';
+import Disability from './components/Disability';
 
 function App() {
   return (
@@ -22,6 +23,7 @@ function App() {
           <Route path="/frontpage" element={<FrontPage />} /> {/* Another route for FrontPage */}
           <Route path="/instructions" element={<Instructions />} /> {/* Another route for FrontPage */}
           <Route path="/playback" element={<Playback />} /> {/* Another route for FrontPage */}
+          <Route path="/disability" element={<Disability />} /> {/* Another route for FrontPage */}
           <Route path="/feedback" element={<Feedback />} /> {/* Another route for FrontPage */}
           {/* Add any additional routes here */}
         </Routes>
