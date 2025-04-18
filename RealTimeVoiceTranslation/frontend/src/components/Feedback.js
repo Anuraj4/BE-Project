@@ -19,21 +19,22 @@ const Feedback = () => {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-
+    
         if (!feedbackType) {
             alert("Please select your feedback (Happy, Neutral, or Sad).");
             return;
         }
-
+    
         setLoading(true);
-
+    
         const templateParams = {
             name: formData.name,
             email: formData.email,
             feedback_type: feedbackType,
             message: formData.message
         };
-
+    
+        // 1. Send feedback email to yourself
         emailjs.send(
             process.env.REACT_APP_EMAILJS_SERVICE_ID,
             process.env.REACT_APP_EMAILJS_TEMPLATE_ID,
@@ -41,17 +42,40 @@ const Feedback = () => {
             process.env.REACT_APP_EMAILJS_USER_ID
         ).then(
             (response) => {
-                console.log("SUCCESS!", response.status, response.text);
-                setSubmitted(true);
-                setLoading(false);
+                console.log("Feedback sent!", response.status, response.text);
+    
+                // 2. Send auto-reply to the user
+                const autoReplyParams = {
+                    name: formData.name,
+                    email: formData.email
+                };
+    
+                emailjs.send(
+                    process.env.REACT_APP_EMAILJS_SERVICE_ID,
+                    process.env.REACT_APP_EMAILJS_AUTOREPLY_TEMPLATE_ID, // Add this to your .env
+                    autoReplyParams,
+                    process.env.REACT_APP_EMAILJS_USER_ID
+                ).then(
+                    (replyResponse) => {
+                        console.log("Auto-reply sent!", replyResponse.status, replyResponse.text);
+                        setSubmitted(true);
+                        setLoading(false);
+                    },
+                    (replyError) => {
+                        console.error("Auto-reply failed...", replyError);
+                        alert("Feedback submitted, but failed to send auto-reply.");
+                        setSubmitted(true); // still count as success for feedback
+                        setLoading(false);
+                    }
+                );
             },
             (error) => {
-                console.error("FAILED...", error);
+                console.error("Feedback failed...", error);
                 alert("Something went wrong. Please try again later.");
                 setLoading(false);
             }
         );
-    };
+    };    
 
     const handleReset = () => {
         setFeedbackType('');
