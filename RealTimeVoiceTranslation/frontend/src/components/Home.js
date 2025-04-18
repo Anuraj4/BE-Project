@@ -32,7 +32,7 @@ const Home = () => {
             </div>
             <div className="tsBody">
                 <div className="select-button">
-                    <h3>Select the language</h3>
+                    <h3 style={{color:"white"}}>Select the language</h3>
                 </div>
                 <div className="home-container">
                     {/* English to Marathi Translator */}

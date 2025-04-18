@@ -46,9 +46,6 @@ body {
     margin-bottom: 20px;
     color: white;
 }
-.tsBody{
-    background-color: #fd6344;
-}
 .home-container {
     display: flex;
     flex-direction: column;

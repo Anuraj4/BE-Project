@@ -5,6 +5,19 @@ const Instructions = () => {
   return (
     <div className="instructions-container">
       <h2 className="instructions-heading">How to Use Our Model</h2>
+      {/* 📹 Video Explanation */}
+      <div style={{ marginBottom: '30px', textAlign: 'center' }}>
+        <video 
+          width="100%" 
+          controls 
+          style={{ borderRadius: '12px', maxHeight: '400px', objectFit: 'cover' }}
+        >
+          <source src="/videos/instructions.mp4" type="video/mp4" />
+          Your browser does not support the video tag.
+        </video>
+      </div>
+
+      {/* 📝 Instructions List */}
       <ul className="instructions-list">
         <li>
           <span className="instruction-step">Step 1:</span> Select the language you want to translate from the options available.

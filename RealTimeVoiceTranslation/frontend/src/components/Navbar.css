@@ -52,6 +52,7 @@ body {
     gap: 35px;
     list-style: none;
     transition: all 0.4s ease;
+    margin-top: 12px;
 }
 
 .nav-links li a {
@@ -144,13 +145,11 @@ body {
         height: 34px;
     }
 }
-
 /* Responsive Navigation */
 @media (max-width: 768px) {
     .hamburger {
         display: flex;
     }
-
     .nav-links {
         position: absolute;
         top: 70px;
