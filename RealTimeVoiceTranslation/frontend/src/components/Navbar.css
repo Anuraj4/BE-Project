@@ -114,6 +114,36 @@ body {
 .hamburger.open .bar:nth-child(3) {
     transform: translateY(-8px) rotate(-45deg);
 }
+@media (max-width: 468px){
+    .brand-name{
+        font-size: 1.2rem;
+    }
+    .bar{
+        width: 20px;
+        margin-right: 10px;
+    }
+    .hamburger{
+        gap: 3px;
+    }
+    .logo{
+        height: 40px;
+    }
+}
+@media (max-width: 348px){
+    .brand-name{
+        font-size: 1rem;
+    }
+    .bar{
+        width: 20px;
+        margin-right: 10px;
+    }
+    .hamburger{
+        gap: 3px;
+    }
+    .logo{
+        height: 34px;
+    }
+}
 
 /* Responsive Navigation */
 @media (max-width: 768px) {

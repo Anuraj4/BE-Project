@@ -1,23 +1,31 @@
 .instructions-container {
-    background-color: #f4f8fb;
+    background: rgba(255, 255, 255, 0.08);
     padding: 40px;
-    border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 16px;
+    box-shadow: 0 8px 32px rgba(31, 38, 135, 0.2);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.18);
     max-width: 800px;
     margin: 30px auto;
     text-align: left;
+    transition: all 0.3s ease;
 }
-body{
-    background-color: white;
+
+body {
+    background: linear-gradient(to bottom right, #0f2027, #203a43, #2c5364);
+    font-family: 'Arial', sans-serif;
+    margin: 0;
+    padding: 0;
 }
 
 .instructions-heading {
     font-size: 2rem;
-    color: #333;
+    color: #ffffff;
     margin-bottom: 30px;
     text-align: center;
-    font-family: 'Arial', sans-serif;
     font-weight: bold;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
 .instructions-list {
@@ -26,28 +34,33 @@ body{
 }
 
 .instructions-list li {
-    background-color: #fff;
-    padding: 15px;
-    margin: 10px 0;
-    border-radius: 6px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-    transition: background-color 0.3s ease;
+    background:#dee2e6;
+    padding: 18px;
+    margin: 12px 0;
+    border-radius: 10px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
 }
 
 .instructions-list li:hover {
-    background-color: #eef2f5;
+    background-color: rgba(138, 255, 206, 0.6);
+    transform: scale(1.02);
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.15);
 }
 
 .instruction-step {
     font-weight: bold;
     color: #007bff;
     margin-right: 10px;
+    font-size: 1.1rem;
 }
 
 .instructions-list li::before {
     content: "✓";
     color: #007bff;
-    font-size: 20px;
+    font-size: 22px;
     margin-right: 15px;
     font-weight: bold;
 }
@@ -74,7 +87,7 @@ body{
 
 @media (max-width: 992px) {
     .instructions-container {
-        padding: 20px;
+        padding: 25px;
     }
 
     .instructions-heading {
@@ -83,12 +96,14 @@ body{
 
     .instructions-list li {
         font-size: 1rem;
+        flex-direction: column;
+        align-items: flex-start;
     }
 }
 
 @media (max-width: 768px) {
     .instructions-container {
-        padding: 15px;
+        padding: 20px;
     }
 
     .instructions-heading {
@@ -102,7 +117,7 @@ body{
 
 @media (max-width: 576px) {
     .instructions-container {
-        padding: 12px;
+        padding: 16px;
     }
 
     .instructions-heading {
@@ -115,12 +130,10 @@ body{
 
     .instructions-list li::before {
         font-size: 18px;
-        /* Smaller checkmark */
         margin-right: 10px;
     }
 
     .instruction-step {
         font-size: 1rem;
-        /* Smaller step text for mobile */
     }
 }
