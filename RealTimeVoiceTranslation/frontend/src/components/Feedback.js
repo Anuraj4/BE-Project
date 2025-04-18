@@ -1,69 +1,128 @@
 import React, { useState } from 'react';
 import './Feedback.css';
 import { FaSmile, FaMeh, FaFrown } from 'react-icons/fa';
+import emailjs from 'emailjs-com';
 
 const Feedback = () => {
-    const [feedback, setFeedback] = useState('');
+    const [feedbackType, setFeedbackType] = useState('');
+    const [formData, setFormData] = useState({ name: '', email: '', message: '' });
     const [submitted, setSubmitted] = useState(false);
+    const [loading, setLoading] = useState(false);
 
     const handleFeedbackClick = (type) => {
-        setFeedback(type);
-        setSubmitted(true);
+        setFeedbackType(type);
+    };
+
+    const handleChange = (e) => {
+        setFormData({ ...formData, [e.target.name]: e.target.value });
+    };
+
+    const handleSubmit = (e) => {
+        e.preventDefault();
+
+        if (!feedbackType) {
+            alert("Please select your feedback (Happy, Neutral, or Sad).");
+            return;
+        }
+
+        setLoading(true);
+
+        const templateParams = {
+            name: formData.name,
+            email: formData.email,
+            feedback_type: feedbackType,
+            message: formData.message
+        };
+
+        emailjs.send(
+            process.env.REACT_APP_EMAILJS_SERVICE_ID,
+            process.env.REACT_APP_EMAILJS_TEMPLATE_ID,
+            templateParams,
+            process.env.REACT_APP_EMAILJS_USER_ID
+        ).then(
+            (response) => {
+                console.log("SUCCESS!", response.status, response.text);
+                setSubmitted(true);
+                setLoading(false);
+            },
+            (error) => {
+                console.error("FAILED...", error);
+                alert("Something went wrong. Please try again later.");
+                setLoading(false);
+            }
+        );
     };
 
     const handleReset = () => {
-        setFeedback('');
+        setFeedbackType('');
+        setFormData({ name: '', email: '', message: '' });
         setSubmitted(false);
     };
 
     return (
         <div className="feedback-page">
             <div className="feedback-container">
-                <h2>How was your experience?</h2>
+                <h2>We'd Love Your Feedback!</h2>
                 {!submitted ? (
-                    <div className="feedback-options">
-                        <button
-                            className="feedback-button smile"
-                            onClick={() => handleFeedbackClick('happy')}
-                        >
-                            <FaSmile className="feedback-icon" /> Happy
+                    <form onSubmit={handleSubmit} className="feedback-form">
+                        <input
+                            type="text"
+                            name="name"
+                            placeholder="Your Name"
+                            value={formData.name}
+                            onChange={handleChange}
+                            required
+                        />
+                        <input
+                            type="email"
+                            name="email"
+                            placeholder="Your Email"
+                            value={formData.email}
+                            onChange={handleChange}
+                            required
+                        />
+
+                        <div className="feedback-options">
+                            <button
+                                type="button"
+                                className={`feedback-button ${feedbackType === 'Happy' ? 'selected' : ''}`}
+                                onClick={() => handleFeedbackClick('Happy')}
+                            >
+                                <FaSmile className="feedback-icon" /> Happy
+                            </button>
+                            <button
+                                type="button"
+                                className={`feedback-button ${feedbackType === 'Neutral' ? 'selected' : ''}`}
+                                onClick={() => handleFeedbackClick('Neutral')}
+                            >
+                                <FaMeh className="feedback-icon" /> Neutral
+                            </button>
+                            <button
+                                type="button"
+                                className={`feedback-button ${feedbackType === 'Sad' ? 'selected' : ''}`}
+                                onClick={() => handleFeedbackClick('Sad')}
+                            >
+                                <FaFrown className="feedback-icon" /> Sad
+                            </button>
+                        </div>
+
+                        <textarea
+                            name="message"
+                            placeholder="Tell us more (optional)..."
+                            value={formData.message}
+                            onChange={handleChange}
+                        />
+
+                        <button type="submit" className="submit-button" disabled={loading}>
+                            {loading ? 'Sending...' : 'Submit Feedback'}
                         </button>
-                        <button
-                            className="feedback-button meh"
-                            onClick={() => handleFeedbackClick('neutral')}
-                        >
-                            <FaMeh className="feedback-icon" /> Neutral
-                        </button>
-                        <button
-                            className="feedback-button frown"
-                            onClick={() => handleFeedbackClick('sad')}
-                        >
-                            <FaFrown className="feedback-icon" /> Sad
-                        </button>
-                    </div>
+                    </form>
                 ) : (
                     <div className="feedback-result">
-                        <p>
-                            {feedback === 'happy' && (
-                                <>
-                                    <FaSmile className="result-icon happy" />
-                                    Thank you for your positive feedback! We're so happy you had a great experience! 😊
-                                </>
-                            )}
-                            {feedback === 'neutral' && (
-                                <>
-                                    <FaMeh className="result-icon neutral" />
-                                    Thanks for your feedback! We'll strive to improve. If you have suggestions, feel free to share. 😐
-                                </>
-                            )}
-                            {feedback === 'sad' && (
-                                <>
-                                    <FaFrown className="result-icon sad" />
-                                    Sorry to hear that. We'll work on making it better. Please let us know how we can improve. 😢
-                                </>
-                            )}
-                        </p>
-                        <button className="reset-button" onClick={handleReset}>Give More Feedback</button>
+                        <p>🎉 Thank you, {formData.name}! Your feedback has been sent successfully.</p>
+                        <button className="reset-button" onClick={handleReset}>
+                            Give More Feedback
+                        </button>
                     </div>
                 )}
             </div>
