@@ -1,52 +1,60 @@
 import express from 'express';
 import { createServer } from 'http';
 import path from 'path';
-import fetch from 'node-fetch'; // Optional if Node version < 18
 import { Server } from 'socket.io';
+import fetch from 'node-fetch';
+import dotenv from 'dotenv';
+
+dotenv.config();
 
 const app = express();
 const server = createServer(app);
 const io = new Server(server, {
   cors: {
     origin: 'http://localhost:3000',
-    methods: ['GET', 'POST', 'PUT', 'DELETE'], // Allowed HTTP methods
-    credentials: true // If you need to send cookies
+    methods: ['GET', 'POST'],
+    credentials: true
   }
 });
 
-// Static file serving
+// Serve static files
 app.use(express.static(path.join(process.cwd(), 'public')));
 
 io.on('connection', (socket) => {
-  console.log('New client connected');
+  console.log('Client connected');
 
-  // Listen for 'audioChunk' event from the frontend
   socket.on('audioChunk', async (text) => {
     try {
-      // Fetch translation
-      const response = await fetch(
-        `https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=en|mr`
-      );
+      const apiKey = process.env.GOOGLE_API_KEY;
+      const url = `https://translation.googleapis.com/language/translate/v2?key=${apiKey}`;
+
+      const response = await fetch(url, {
+        method: 'POST',
+        body: JSON.stringify({
+          q: text,
+          target: 'mr', // Marathi
+          source: 'en',
+          format: 'text'
+        }),
+        headers: { 'Content-Type': 'application/json' }
+      });
+
       const data = await response.json();
-      const translatedText = data.responseData.translatedText;
+      const translatedText = data.data.translations[0].translatedText;
 
       console.log('Translated Text:', translatedText);
-
-      // Send the translated text back to the frontend
       socket.emit('translatedText', translatedText);
     } catch (error) {
-      console.error('Error during translation:', error);
-      socket.emit('translatedText', 'Error translating text');
+      console.error('Translation error:', error);
+      socket.emit('translatedText', 'Translation failed.');
     }
   });
 
-  // Handle client disconnect
   socket.on('disconnect', () => {
     console.log('Client disconnected');
   });
 });
 
-// Start the server
 server.listen(5000, () => {
-  console.log('Server running on port 5000');
+  console.log('Server running on http://localhost:5000');
 });
