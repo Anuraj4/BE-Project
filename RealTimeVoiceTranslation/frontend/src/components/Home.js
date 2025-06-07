@@ -1,77 +1,47 @@
-import React, { useState } from "react";
-import Translator from "./Translator";
-import Button from "react-bootstrap/Button";
-import MarathiToEnglish from "./MarathiToEnglish";
-import "./Home.css";
+import React, { useState } from 'react';
+import Translator from './Translator';
+import './Home.css';
+
+const languages = [
+  { code: 'en', name: 'English' },
+  { code: 'mr', name: 'Marathi' },
+  { code: 'hi', name: 'Hindi' },
+  { code: 'ta', name: 'Tamil' },
+  { code: 'te', name: 'Telugu' },
+];
 
 const Home = () => {
-    const [showTranslator, setShowTranslator] = useState(false);
-    const [showMarathiToEnglish, setShowMarathiToEnglish] = useState(false);
+  const [sourceLang, setSourceLang] = useState('en');
+  const [targetLang, setTargetLang] = useState('mr');
 
-    // Toggle visibility of Translator component
-    const handleTranslatorButtonClick = () => {
-        setShowTranslator((prevState) => !prevState);
-    };
-
-    // Toggle visibility of MarathiToEnglish component
-    const handleMarathiToEnglishButtonClick = () => {
-        setShowMarathiToEnglish((prevState) => !prevState);
-    };
-
-    return (
-        <>
-            <div className="hero-section">
-                <div className="content">
-                    <h1 className="main-heading-Home animate-heading">
-                        Real-Time Language Translation
-                    </h1>
-                    <p className="description animate-fade">
-                        Experience seamless language translation powered by AI, bridging communication gaps with real-time accuracy.
-                    </p>
-                </div>
-            </div>
-            <div className="tsBody">
-                <div className="select-button">
-                    <h3 style={{color:"white"}}>Select the language</h3>
-                </div>
-                <div className="home-container">
-                    {/* English to Marathi Translator */}
-                    <div className="button-container">
-                        <Button
-                            className={`btn-lg custom-btn ${showTranslator ? "active-btn" : ""
-                                }`}
-                            onClick={handleTranslatorButtonClick}
-                        >
-                            {showTranslator ? "Close Translator" : "English To Marathi"}
-                        </Button>
-                        <div
-                            className={`translator-container ${showTranslator ? "fade-in" : "fade-out"
-                                }`}
-                        >
-                            {showTranslator && <Translator />}
-                        </div>
-                    </div>
-
-                    {/* Marathi to English Translator */}
-                    <div className="button-container">
-                        <Button
-                            className={`btn-lg custom-btn ${showMarathiToEnglish ? "active-btn" : ""
-                                }`}
-                            onClick={handleMarathiToEnglishButtonClick}
-                        >
-                            {showMarathiToEnglish ? "Close Translator" : "Marathi To English"}
-                        </Button>
-                        <div
-                            className={`translator-container ${showMarathiToEnglish ? "fade-in" : "fade-out"
-                                }`}
-                        >
-                            {showMarathiToEnglish && <MarathiToEnglish />}
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </>
-    );
+  return (
+    <div className="home-container">
+      <h1>Real-Time Language Translation</h1>
+      <div className="language-selection">
+        <label>
+          Input Language:
+          <select value={sourceLang} onChange={(e) => setSourceLang(e.target.value)}>
+            {languages.map((lang) => (
+              <option key={lang.code} value={lang.code}>
+                {lang.name}
+              </option>
+            ))}
+          </select>
+        </label>
+        <label>
+          Target Language:
+          <select value={targetLang} onChange={(e) => setTargetLang(e.target.value)}>
+            {languages.map((lang) => (
+              <option key={lang.code} value={lang.code}>
+                {lang.name}
+              </option>
+            ))}
+          </select>
+        </label>
+      </div>
+      <Translator sourceLang={sourceLang} targetLang={targetLang} />
+    </div>
+  );
 };
 
 export default Home;

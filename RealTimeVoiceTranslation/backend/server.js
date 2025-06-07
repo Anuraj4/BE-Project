@@ -1,51 +1,61 @@
 import express from 'express';
 import { createServer } from 'http';
-import path from 'path';
-import fetch from 'node-fetch'; // Optional if Node version < 18
 import { Server } from 'socket.io';
+import fetch from 'node-fetch';
+import cors from 'cors';
 
 const app = express();
 const server = createServer(app);
 const io = new Server(server, {
   cors: {
     origin: 'http://localhost:3000',
-    methods: ['GET', 'POST', 'PUT', 'DELETE'], // Allowed HTTP methods
-    credentials: true // If you need to send cookies
-  }
+    methods: ['GET', 'POST'],
+    credentials: true,
+  },
 });
 
-// Static file serving
-app.use(express.static(path.join(process.cwd(), 'public')));
+app.use(cors());
+app.use(express.json());
 
 io.on('connection', (socket) => {
   console.log('New client connected');
 
-  // Listen for 'audioChunk' event from the frontend
-  socket.on('audioChunk', async (text) => {
+  socket.on('audioChunk', async ({ text, sourceLang, targetLang }) => {
     try {
-      // Fetch translation
-      const response = await fetch(
-        `https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=en|mr`
-      );
-      const data = await response.json();
-      const translatedText = data.responseData.translatedText;
+      const response = await fetch('https://translateai.p.rapidapi.com/google/translate/json', {
+        method: 'POST',
+        headers: {
+          'x-rapidapi-key': 'cb08593354msh02368129a061c44p15fb3ejsn5b8905f700d1',
+          'x-rapidapi-host': 'translateai.p.rapidapi.com',
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          origin_language: sourceLang,
+          target_language: targetLang,
+          words_not_to_translate: '',
+          paths_to_exclude: '',
+          common_keys_to_exclude: '',
+          json_content: {
+            content: text,
+          },
+        }),
+      });
 
-      console.log('Translated Text:', translatedText);
+      const result = await response.json();
+      const translatedText = result.translated_json?.content || 'Translation error';
 
-      // Send the translated text back to the frontend
       socket.emit('translatedText', translatedText);
     } catch (error) {
       console.error('Error during translation:', error);
       socket.emit('translatedText', 'Error translating text');
     }
   });
-  // Handle client disconnect
+
   socket.on('disconnect', () => {
     console.log('Client disconnected');
   });
 });
 
-// Start the server
 server.listen(5000, () => {
   console.log('Server running on port 5000');
 });

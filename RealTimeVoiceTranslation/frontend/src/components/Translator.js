@@ -1,173 +1,130 @@
-import React, { useState, useRef, useEffect, useCallback } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import io from 'socket.io-client';
-import Sentiment from 'sentiment';
-import './Translator.css';
-import Button from 'react-bootstrap/Button';
-import Playback from './Playback';
 
-const socket = io('http://localhost:5000', {
-  transports: ['websocket']
-});
+const socket = io('http://localhost:5000');
 
-const Translator = () => {
+const Translator = ({ sourceLang, targetLang }) => {
   const [isRecording, setIsRecording] = useState(false);
   const [transcription, setTranscription] = useState('');
-  const [interimTranscription, setInterimTranscription] = useState('');
   const [translatedText, setTranslatedText] = useState('');
-  const speechRecognitionRef = useRef(null);
+  const recognitionRef = useRef(null);
+  const shouldContinueRef = useRef(false);
 
-  const isSpeakingRef = useRef(false);
-  const isRecognitionActiveRef = useRef(false);
+  // Load voices once
+  const voicesRef = useRef([]);
 
-  // DEBUG: Log available voices
   useEffect(() => {
-    const loadVoices = () => {
-      const voices = window.speechSynthesis.getVoices();
-      console.log("Available voices:", voices);
+    // Update voices list when voices changed (some browsers load voices asynchronously)
+    window.speechSynthesis.onvoiceschanged = () => {
+      voicesRef.current = window.speechSynthesis.getVoices();
     };
-    window.speechSynthesis.onvoiceschanged = loadVoices;
-    loadVoices();
+    // Initial load
+    voicesRef.current = window.speechSynthesis.getVoices();
   }, []);
-
-  const speakTranslatedText = useCallback((text) => {
-    if (!text) return;
-
-    if (speechRecognitionRef.current && isRecognitionActiveRef.current) {
-      speechRecognitionRef.current.stop();
-      isRecognitionActiveRef.current = false;
-    }
-
-    isSpeakingRef.current = true;
-
-    const utterance = new SpeechSynthesisUtterance(text);
-    const voices = window.speechSynthesis.getVoices();
-    const marathiVoice = voices.find(v => v.lang === 'mr-IN');
-
-    if (marathiVoice) {
-      utterance.voice = marathiVoice;
-    } else {
-      console.warn("No Marathi voice found. Using default voice.");
-    }
-
-    utterance.lang = 'mr-IN';
-    utterance.pitch = 1;
-    utterance.rate = 1;
-    utterance.volume = 1;
-
-    utterance.onend = () => {
-      isSpeakingRef.current = false;
-      if (isRecording && !isRecognitionActiveRef.current) {
-        speechRecognitionRef.current.start();
-        isRecognitionActiveRef.current = true;
-      }
-    };
-
-    window.speechSynthesis.speak(utterance);
-  }, [isRecording]);
-
-  const startRecording = () => {
-    if (!('webkitSpeechRecognition' in window)) {
-      alert('Your browser does not support speech recognition. Please use Google Chrome.');
-      return;
-    }
-
-    const SpeechRecognition = window.webkitSpeechRecognition;
-    const recognition = new SpeechRecognition();
-    recognition.lang = 'en-US';
-    recognition.continuous = true;
-    recognition.interimResults = true;
-
-    recognition.onstart = () => {
-      isRecognitionActiveRef.current = true;
-    };
-
-    recognition.onend = () => {
-      isRecognitionActiveRef.current = false;
-      if (isRecording && !isSpeakingRef.current) {
-        recognition.start();
-        isRecognitionActiveRef.current = true;
-      }
-    };
-
-    recognition.onresult = (event) => {
-      if (isSpeakingRef.current) return;
-
-      let interimTranscript = '';
-      let finalTranscript = '';
-
-      for (let i = event.resultIndex; i < event.results.length; ++i) {
-        if (event.results[i].isFinal) {
-          finalTranscript += event.results[i][0].transcript;
-        } else {
-          interimTranscript += event.results[i][0].transcript;
-        }
-      }
-
-      setInterimTranscription(interimTranscript);
-      setTranscription((prev) => prev + finalTranscript);
-
-      if (finalTranscript) {
-        socket.emit('audioChunk', finalTranscript);
-      }
-    };
-
-    recognition.start();
-    speechRecognitionRef.current = recognition;
-    setIsRecording(true);
-  };
-
-  const stopRecording = () => {
-    if (speechRecognitionRef.current && isRecognitionActiveRef.current) {
-      speechRecognitionRef.current.stop();
-      isRecognitionActiveRef.current = false;
-    }
-    setIsRecording(false);
-    window.speechSynthesis.cancel();
-  };
 
   useEffect(() => {
     socket.on('translatedText', (translated) => {
       setTranslatedText(translated);
-      if (isRecording) {
-        speakTranslatedText(translated);
-      }
+      stopRecognition(); // Stop mic before speaking
+      speakText(translated, targetLang);
+
+      // Save to localStorage (max 10 entries)
+      const entry = {
+        transcription,
+        translation: translated,
+      };
+      const existing = JSON.parse(localStorage.getItem('translationHistory')) || [];
+      const updated = [entry, ...existing].slice(0, 10);
+      localStorage.setItem('translationHistory', JSON.stringify(updated));
     });
 
     return () => {
       socket.off('translatedText');
     };
-  }, [isRecording, speakTranslatedText]);
+  }, [targetLang, transcription]);
+
+  const speakText = (text, lang) => {
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.lang = lang;
+
+    // Select voice matching language prefix (e.g. "hi", "mr", "ta")
+    const voice = voicesRef.current.find(v => v.lang.toLowerCase().startsWith(lang.toLowerCase())) || voicesRef.current[0];
+    if (voice) {
+      utterance.voice = voice;
+    }
+
+    utterance.onend = () => {
+      if (shouldContinueRef.current) {
+        startRecognition(); // Resume mic after speaking
+      }
+    };
+
+    window.speechSynthesis.speak(utterance);
+  };
+
+  const startRecognition = () => {
+    if (!('webkitSpeechRecognition' in window)) {
+      alert('Your browser does not support speech recognition.');
+      return;
+    }
+
+    const recognition = new window.webkitSpeechRecognition();
+    recognition.lang = sourceLang;
+    recognition.continuous = false;
+    recognition.interimResults = false;
+
+    recognition.onresult = (event) => {
+      const transcript = Array.from(event.results)
+        .map((result) => result[0].transcript)
+        .join('');
+      setTranscription(transcript);
+      socket.emit('audioChunk', { text: transcript, sourceLang, targetLang });
+    };
+
+    recognition.onend = () => {
+      // Do nothing here. Wait until speech synthesis completes.
+    };
+
+    recognitionRef.current = recognition;
+    recognition.start();
+  };
+
+  const stopRecognition = () => {
+    if (recognitionRef.current) {
+      recognitionRef.current.onend = null;
+      recognitionRef.current.stop();
+    }
+  };
+
+  const startRecording = () => {
+    shouldContinueRef.current = true;
+    setIsRecording(true);
+    startRecognition();
+  };
+
+  const stopRecording = () => {
+    shouldContinueRef.current = false;
+    setIsRecording(false);
+    stopRecognition();
+    window.speechSynthesis.cancel();
+  };
 
   return (
-    <div className="container text-center">
-      <h1 className="custom-bold">Real-Time Voice Translation</h1>
-      <p className="lead mb-4 text-secondary">English to Marathi</p>
-
-      <Button
-        className="btn-lg mt-1"
-        variant={isRecording ? 'danger' : 'success'}
+    <div className="translator-container">
+      <button
+        className="stop-recording-button"
         onClick={isRecording ? stopRecording : startRecording}
       >
         {isRecording ? 'Stop Recording' : 'Start Recording'}
-      </Button>
-
-      <div className="mt-4">
-        <h5 className="text-muted">Transcription (English):</h5>
-        <p className="transcription-text">{transcription || 'No transcription yet...'}</p>
-        <p className="text-muted interim-text">{interimTranscription}</p>
+      </button>
+      <div>
+        <h3>Transcription:</h3>
+        <p>{transcription}</p>
       </div>
-
-      <div className="mt-4">
-        <h5 className="text-muted">Translated Text (Marathi):</h5>
-        <p className="translated-text">{translatedText || 'No translation yet...'}</p>
+      <div>
+        <h3>Translation:</h3>
+        <p>{translatedText}</p>
       </div>
-
-      {/* Optional test button */}
-      <Button className="mt-3" variant="info" onClick={() => speakTranslatedText("नमस्कार, तुमचं भाषांतर पूर्ण झालं आहे")}>
-        Test Speak Marathi
-      </Button>
-
-      <Playback translatedText={translatedText} />
     </div>
   );
 };
