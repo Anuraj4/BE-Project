@@ -9,95 +9,26 @@ const Translator = ({ sourceLang, targetLang }) => {
   const [translatedText, setTranslatedText] = useState('');
   const recognitionRef = useRef(null);
   const shouldContinueRef = useRef(false);
-  const voicesRef = useRef([]);
-
-  useEffect(() => {
-    const loadVoices = () => {
-      voicesRef.current = window.speechSynthesis.getVoices();
-    };
-
-    loadVoices();
-    if (window.speechSynthesis.onvoiceschanged !== undefined) {
-      window.speechSynthesis.onvoiceschanged = loadVoices;
-    }
-  }, []);
 
   useEffect(() => {
     socket.on('translatedText', (translated) => {
       setTranslatedText(translated);
-      stopRecognition();
-      const emotion = detectEmotion(transcription);
-      speakText(translated, targetLang, emotion);
-
-      const entry = {
-        transcription,
-        translation: translated,
-      };
-      const existing = JSON.parse(localStorage.getItem('translationHistory')) || [];
-      const updated = [entry, ...existing].slice(0, 10);
-      localStorage.setItem('translationHistory', JSON.stringify(updated));
+      stopRecognition(); // Stop mic before speaking
+      speakText(translated, targetLang);
     });
 
     return () => {
       socket.off('translatedText');
     };
-  }, [targetLang, transcription]);
+  }, [targetLang]);
 
-  const detectEmotion = (text) => {
-    const lowerText = text.toLowerCase();
-    if (lowerText.includes('angry') || lowerText.includes('rage')) return 'angry';
-    if (lowerText.includes('sad') || lowerText.includes('cry')) return 'sad';
-    if (lowerText.includes('happy') || lowerText.includes('joy')) return 'happy';
-    if (lowerText.includes('surprise') || lowerText.includes('shocked')) return 'surprised';
-    return 'neutral';
-  };
-
-  const speakText = (text, lang, emotion = 'neutral') => {
+  const speakText = (text, lang) => {
     const utterance = new SpeechSynthesisUtterance(text);
     utterance.lang = lang;
 
-    // Emotion tone mapping
-    switch (emotion) {
-      case 'angry':
-        utterance.pitch = 0.7;
-        utterance.rate = 1.2;
-        break;
-      case 'sad':
-        utterance.pitch = 0.6;
-        utterance.rate = 0.9;
-        break;
-      case 'happy':
-        utterance.pitch = 1.4;
-        utterance.rate = 1.3;
-        break;
-      case 'surprised':
-        utterance.pitch = 1.6;
-        utterance.rate = 1.1;
-        break;
-      default:
-        utterance.pitch = 1;
-        utterance.rate = 1;
-    }
-
-    // Prioritize exact or partial match for desired language
-    let voice = voicesRef.current.find(v => v.lang.toLowerCase().startsWith(lang.toLowerCase()));
-
-    if (!voice && lang === 'mr') {
-      voice = voicesRef.current.find(v => v.lang.toLowerCase().includes('hi'));
-    }
-
-    if (!voice) {
-      voice = voicesRef.current.find(v => v.lang.toLowerCase().includes('en'));
-    }
-
-    if (voice) {
-      utterance.voice = voice;
-      utterance.lang = voice.lang;
-    }
-
     utterance.onend = () => {
       if (shouldContinueRef.current) {
-        startRecognition();
+        startRecognition(); // Resume mic after speaking
       }
     };
 
@@ -124,7 +55,7 @@ const Translator = ({ sourceLang, targetLang }) => {
     };
 
     recognition.onend = () => {
-      // no-op
+      // Wait for speech synthesis to finish before resuming
     };
 
     recognitionRef.current = recognition;
@@ -153,10 +84,7 @@ const Translator = ({ sourceLang, targetLang }) => {
 
   return (
     <div className="translator-container">
-      <button
-        className="stop-recording-button"
-        onClick={isRecording ? stopRecording : startRecording}
-      >
+      <button className="stop-recording-button" onClick={isRecording ? stopRecording : startRecording}>
         {isRecording ? 'Stop Recording' : 'Start Recording'}
       </button>
       <div>

@@ -1,18 +1,35 @@
-import React, { useState } from 'react';
-import Translator from './Translator';
-import './Home.css';
+import React, { useState } from "react";
+import Translator from "./Translator";
+import "./Home.css";
 
 const languages = [
-  { code: 'en', name: 'English' },
-  { code: 'mr', name: 'Marathi' },
-  { code: 'hi', name: 'Hindi' },
-  { code: 'ta', name: 'Tamil' },
-  { code: 'te', name: 'Telugu' },
+  { code: "en", name: "English" },
+  { code: "mr", name: "Marathi" },
+  { code: "hi", name: "Hindi" },
+  { code: "ta", name: "Tamil" },
+  { code: "te", name: "Telugu" },
+  { code: "bn", name: "Bengali" },
+  { code: "gu", name: "Gujarati" },
+  { code: "kn", name: "Kannada" },
+  { code: "ml", name: "Malayalam" },
+  { code: "pa", name: "Punjabi" },
+  { code: "ur", name: "Urdu" },
+  { code: "ne", name: "Nepali" },
+  { code: "si", name: "Sinhala" },
+  { code: "fr", name: "French" },
+  { code: "es", name: "Spanish" },
+  { code: "de", name: "German" },
+  { code: "it", name: "Italian" },
+  { code: "ja", name: "Japanese" },
+  { code: "ko", name: "Korean" },
+  { code: "zh", name: "Chinese" },
+  { code: "ru", name: "Russian" },
+  { code: "ar", name: "Arabic" },
 ];
 
 const Home = () => {
-  const [sourceLang, setSourceLang] = useState('en');
-  const [targetLang, setTargetLang] = useState('mr');
+  const [sourceLang, setSourceLang] = useState("en");
+  const [targetLang, setTargetLang] = useState("mr");
 
   return (
     <div className="home-container">
@@ -20,7 +37,10 @@ const Home = () => {
       <div className="language-selection">
         <label>
           Input Language:
-          <select value={sourceLang} onChange={(e) => setSourceLang(e.target.value)}>
+          <select
+            value={sourceLang}
+            onChange={(e) => setSourceLang(e.target.value)}
+          >
             {languages.map((lang) => (
               <option key={lang.code} value={lang.code}>
                 {lang.name}
@@ -30,7 +50,10 @@ const Home = () => {
         </label>
         <label>
           Target Language:
-          <select value={targetLang} onChange={(e) => setTargetLang(e.target.value)}>
+          <select
+            value={targetLang}
+            onChange={(e) => setTargetLang(e.target.value)}
+          >
             {languages.map((lang) => (
               <option key={lang.code} value={lang.code}>
                 {lang.name}
