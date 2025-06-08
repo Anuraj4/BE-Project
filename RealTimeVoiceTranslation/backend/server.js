@@ -1,4 +1,4 @@
-import express from 'express';
+ import express from 'express';
 import { createServer } from 'http';
 import { Server } from 'socket.io';
 import fetch from 'node-fetch';
@@ -21,11 +21,13 @@ io.on('connection', (socket) => {
   console.log('New client connected');
 
   socket.on('audioChunk', async ({ text, sourceLang, targetLang }) => {
+    console.log(`Translating: "${text}" from ${sourceLang} to ${targetLang}`);
+
     try {
       const response = await fetch('https://translateai.p.rapidapi.com/google/translate/json', {
         method: 'POST',
         headers: {
-          'x-rapidapi-key': 'cb08593354msh02368129a061c44p15fb3ejsn5b8905f700d1',
+          'x-rapidapi-key': '00ca0e505dmsh5682b408ae568e3p13e602jsn96e9d7929295',
           'x-rapidapi-host': 'translateai.p.rapidapi.com',
           'Content-Type': 'application/json',
         },
@@ -41,12 +43,25 @@ io.on('connection', (socket) => {
         }),
       });
 
+      if (!response.ok) {
+        console.error('API error:', response.status, response.statusText);
+        socket.emit('translatedText', `API error: ${response.statusText}`);
+        return;
+      }
+
       const result = await response.json();
-      const translatedText = result.translated_json?.content || 'Translation error';
+      console.log('API response:', JSON.stringify(result, null, 2));
+
+      const translatedText = result.translated_json?.content;
+      if (!translatedText) {
+        console.error('No translated text found');
+        socket.emit('translatedText', 'Translation error: No translated text found');
+        return;
+      }
 
       socket.emit('translatedText', translatedText);
     } catch (error) {
-      console.error('Error during translation:', error);
+      console.error('Translation error:', error);
       socket.emit('translatedText', 'Error translating text');
     }
   });
