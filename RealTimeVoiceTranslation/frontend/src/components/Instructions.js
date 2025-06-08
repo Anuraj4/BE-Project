@@ -4,7 +4,7 @@ import './Instructions.css';
 const Instructions = () => {
   return (
     <div className="instructions-container">
-      <h2 className="instructions-heading">How to Use Our Model</h2>
+      <h2 className="instructions-heading" style={{color:"white"}}>How to Use Our Model</h2>
       {/* 📝 Instructions List */}
       <ul className="instructions-list">
         <li>

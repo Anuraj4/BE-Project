@@ -3,55 +3,78 @@ import io from "socket.io-client";
 
 const socket = io("http://localhost:5000");
 
-const Translator = ({ sourceLang, targetLang }) => {
+const VoiceControlledTranslator = ({ sourceLang, targetLang }) => {
   const [isRecording, setIsRecording] = useState(false);
   const [transcription, setTranscription] = useState("");
   const [translatedText, setTranslatedText] = useState("");
   const recognitionRef = useRef(null);
   const shouldContinueRef = useRef(false);
+  const confirmationRef = useRef(null);
 
+  const speak = (text, callback) => {
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.lang = "en-US";
+    utterance.onend = callback;
+    window.speechSynthesis.cancel(); // cancel ongoing speech
+    window.speechSynthesis.speak(utterance);
+  };
+
+  // Ask to start
   useEffect(() => {
+    speak("Can we start recording?", () => {
+      startConfirmationRecognition(); // Listen for 'yes'
+    });
+
     socket.on("translatedText", (translated) => {
       setTranslatedText(translated);
-      stopRecognition(); // Stop mic before speaking
-      speakText(translated, targetLang);
+      stopRecognition();
+      speak(translated, targetLang);
 
-      // Store to localStorage
-      const currentEntry = { transcription, translation: translated };
-      const existingHistory =
+      // ✅ Store transcription and translation in localStorage
+      const entry = { transcription, translation: translated };
+      const existing =
         JSON.parse(localStorage.getItem("translationHistory")) || [];
-      existingHistory.unshift(currentEntry); // Add newest to the top
+      existing.unshift(entry); // Add latest on top
       localStorage.setItem(
         "translationHistory",
-        JSON.stringify(existingHistory.slice(0, 10))
-      ); // Limit to last 10
+        JSON.stringify(existing.slice(0, 10))
+      ); // Keep last 10 entries
     });
 
     return () => {
       socket.off("translatedText");
     };
-  }, [targetLang, transcription]); // <- Add `transcription` as dependency
+  }, [targetLang, transcription]); // ✅ Make sure `transcription` is a dependency
 
-  const speakText = (text, lang) => {
-    const utterance = new SpeechSynthesisUtterance(text);
-    utterance.lang = lang;
+  const startConfirmationRecognition = () => {
+    const confirmRecog = new (window.SpeechRecognition ||
+      window.webkitSpeechRecognition)();
+    confirmRecog.lang = "en-US";
+    confirmRecog.interimResults = false;
+    confirmRecog.maxAlternatives = 1;
 
-    utterance.onend = () => {
-      if (shouldContinueRef.current) {
-        startRecognition(); // Resume mic after speaking
+    confirmRecog.onresult = (event) => {
+      const result = event.results[0][0].transcript.toLowerCase().trim();
+      if (result.includes("yes")) {
+        speak("Starting recording now.", () => {
+          startRecording();
+        });
+      } else {
+        speak("Recording cancelled. Reload the page to start again.");
       }
     };
 
-    window.speechSynthesis.speak(utterance);
+    confirmRecog.onerror = (e) => {
+      console.error("Confirmation recognition error:", e);
+    };
+
+    confirmRecog.start();
+    confirmationRef.current = confirmRecog;
   };
 
   const startRecognition = () => {
-    if (!("webkitSpeechRecognition" in window)) {
-      alert("Your browser does not support speech recognition.");
-      return;
-    }
-
-    const recognition = new window.webkitSpeechRecognition();
+    const recognition = new (window.SpeechRecognition ||
+      window.webkitSpeechRecognition)();
     recognition.lang = sourceLang;
     recognition.continuous = false;
     recognition.interimResults = false;
@@ -65,7 +88,13 @@ const Translator = ({ sourceLang, targetLang }) => {
     };
 
     recognition.onend = () => {
-      // Wait for speech synthesis to finish before resuming
+      if (shouldContinueRef.current) {
+        // wait until speech ends before resuming
+      }
+    };
+
+    recognition.onerror = (e) => {
+      console.error("Recognition error:", e);
     };
 
     recognitionRef.current = recognition;
@@ -94,12 +123,14 @@ const Translator = ({ sourceLang, targetLang }) => {
 
   return (
     <div className="translator-container">
+      <h2 style={{ color: "white" }}>Voice Translator</h2>
       <button
         className="stop-recording-button"
         onClick={isRecording ? stopRecording : startRecording}
       >
         {isRecording ? "Stop Recording" : "Start Recording"}
       </button>
+
       <div>
         <h3 style={{ color: "white" }}>Transcription:</h3>
         <p style={{ color: "white" }}>{transcription}</p>
@@ -112,4 +143,4 @@ const Translator = ({ sourceLang, targetLang }) => {
   );
 };
 
-export default Translator;
+export default VoiceControlledTranslator;
