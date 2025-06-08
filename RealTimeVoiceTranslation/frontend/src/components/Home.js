@@ -2,6 +2,31 @@ import React, { useState } from "react";
 import Translator from "./Translator";
 import "./Home.css";
 
+const languageFlags = {
+  en: "🇬🇧",
+  mr: "🇮🇳",
+  hi: "🇮🇳",
+  ta: "🇮🇳",
+  te: "🇮🇳",
+  bn: "🇮🇳",
+  gu: "🇮🇳",
+  kn: "🇮🇳",
+  ml: "🇮🇳",
+  pa: "🇮🇳",
+  ur: "🇵🇰",
+  ne: "🇳🇵",
+  si: "🇱🇰",
+  fr: "🇫🇷",
+  es: "🇪🇸",
+  de: "🇩🇪",
+  it: "🇮🇹",
+  ja: "🇯🇵",
+  ko: "🇰🇷",
+  zh: "🇨🇳",
+  ru: "🇷🇺",
+  ar: "🇸🇦",
+};
+
 const languages = [
   { code: "en", name: "English" },
   { code: "mr", name: "Marathi" },
@@ -37,6 +62,7 @@ const Home = () => {
       <div className="language-selection">
         <label>
           Input Language:
+          <span className="flag-emoji">{languageFlags[sourceLang]}</span>
           <select
             value={sourceLang}
             onChange={(e) => setSourceLang(e.target.value)}
@@ -50,6 +76,7 @@ const Home = () => {
         </label>
         <label>
           Target Language:
+          <span className="flag-emoji">{languageFlags[targetLang]}</span>
           <select
             value={targetLang}
             onChange={(e) => setTargetLang(e.target.value)}

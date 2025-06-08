@@ -574,4 +574,17 @@ body {
     width: 100%;
     max-width: 300px;
   }
+  .flag-emoji {
+    font-size: 1.5rem;
+  }
+}
+.flag-emoji {
+  font-size: 1.8rem;
+  user-select: none;
+  transition: transform 0.3s ease;
+}
+
+.language-selection select:focus + .flag-emoji,
+.language-selection select:hover + .flag-emoji {
+  transform: scale(1);
 }
