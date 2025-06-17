@@ -9,10 +9,14 @@ const Translator = ({ sourceLang, targetLang }) => {
   const [translatedText, setTranslatedText] = useState("");
   const recognitionRef = useRef(null);
   const shouldContinueRef = useRef(false);
+  const emotionRef = useRef("Neutral"); // Used internally for pitch control
 
   useEffect(() => {
     socket.on("translatedText", (translated) => {
       setTranslatedText(translated);
+      const detected = detectEmotion(translated);
+      emotionRef.current = detected;
+
       stopRecognition(); // Stop mic before speaking
       speakText(translated, targetLang);
 
@@ -20,25 +24,57 @@ const Translator = ({ sourceLang, targetLang }) => {
       const currentEntry = { transcription, translation: translated };
       const existingHistory =
         JSON.parse(localStorage.getItem("translationHistory")) || [];
-      existingHistory.unshift(currentEntry); // Add newest to the top
+      existingHistory.unshift(currentEntry);
       localStorage.setItem(
         "translationHistory",
         JSON.stringify(existingHistory.slice(0, 10))
-      ); // Limit to last 10
+      );
     });
 
     return () => {
       socket.off("translatedText");
     };
-  }, [targetLang, transcription]); // <- Add `transcription` as dependency
+  }, [targetLang, transcription]);
+
+  const detectEmotion = (text) => {
+    const lower = text.toLowerCase();
+    if (lower.includes("happy") || lower.includes("great") || lower.includes("love")) return "Happy";
+    if (lower.includes("sad") || lower.includes("bad") || lower.includes("sorry")) return "Sad";
+    if (lower.includes("angry") || lower.includes("hate") || lower.includes("annoyed")) return "Angry";
+    if (lower.includes("wow") || lower.includes("amazing") || lower.includes("unbelievable")) return "Surprised";
+    return "Neutral";
+  };
 
   const speakText = (text, lang) => {
     const utterance = new SpeechSynthesisUtterance(text);
     utterance.lang = lang;
 
+    // Apply pitch and rate based on detected emotion
+    switch (emotionRef.current) {
+      case "Happy":
+        utterance.pitch = 1.5;
+        utterance.rate = 1.2;
+        break;
+      case "Sad":
+        utterance.pitch = 0.8;
+        utterance.rate = 0.9;
+        break;
+      case "Angry":
+        utterance.pitch = 1.0;
+        utterance.rate = 1.4;
+        break;
+      case "Surprised":
+        utterance.pitch = 1.8;
+        utterance.rate = 1.5;
+        break;
+      default:
+        utterance.pitch = 1.0;
+        utterance.rate = 1.0;
+    }
+
     utterance.onend = () => {
       if (shouldContinueRef.current) {
-        startRecognition(); // Resume mic after speaking
+        startRecognition();
       }
     };
 

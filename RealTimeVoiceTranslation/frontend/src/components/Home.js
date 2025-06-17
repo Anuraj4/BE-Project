@@ -54,7 +54,7 @@ const languages = [
 
 const Home = () => {
   const [sourceLang, setSourceLang] = useState("en");
-  const [targetLang, setTargetLang] = useState("mr");
+  const [targetLang, setTargetLang] = useState("hi");
 
   return (
     <div className="home-container">
